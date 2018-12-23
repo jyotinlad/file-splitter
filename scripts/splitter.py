@@ -1,5 +1,6 @@
-from os import path
+from collections import defaultdict
 from json import dumps
+from os import path
 
 # define directories
 root_dir = path.dirname(path.dirname(__file__))
@@ -11,6 +12,7 @@ target_dir = path.join(files_dir, "target")
 filename = "BlackFriday.csv"
 file = path.join(source_dir, filename)
 
+# define file separator
 seperator = ","
 
 with open(file, "r") as fh_in:
@@ -19,19 +21,31 @@ with open(file, "r") as fh_in:
     header = header.rstrip()
     columns = header.split(seperator)
 
+    # store for sales per product
+    products = defaultdict(list)
+
+    # iterate sales
     lines = fh_in.readlines()
     for line in lines:
         line = line.rstrip()
         rec = dict(zip(columns, line.split(seperator)))
 
-        # check user and product exist so a good file name can be created
-        user = rec.get("User_ID")
-        product = rec.get("Product_ID")
-        if not user and not product:
-            continue
+        # check product ID exists
+        product_id = rec.get("Product_ID")
+        if product_id:
+            # add sale to the list for the product
+            products[product_id].append(rec)
 
-        output_filename = "{}.{}.json".format(user, product)
+    # output file per product
+    for product_id in products:
+        output_filename = "{}.json".format(product_id)
         output_file = path.join(target_dir, output_filename)
         print("creating file: {}".format(output_filename))
         with open(output_file, "w") as fh_out:
-            fh_out.write(dumps(rec, indent=4))
+            # print header row
+            fh_out.write("{}\n".format(",".join(columns)))
+
+            for rec in products.get(product_id):
+                # print record row
+                values = list(map(rec.get, columns))
+                fh_out.write("{}\n".format(",".join(values)))
