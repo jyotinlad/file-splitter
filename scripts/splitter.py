@@ -1,19 +1,18 @@
 from collections import defaultdict
-from json import dumps
 from os import path
 
 # define directories
 root_dir = path.dirname(path.dirname(__file__))
 files_dir = path.join(root_dir, "files")
 source_dir = path.join(files_dir, "source")
-target_dir = path.join(files_dir, "target")
+target_dir = path.join(files_dir, "target")  #TODO make a supplied argument using argparse
 
 # define source file
 filename = "BlackFriday.csv"
-file = path.join(source_dir, filename)
+file = path.join(source_dir, filename) #TODO make a supplied argument using argparse
 
 # define file separator
-seperator = ","
+seperator = ","  #TODO make a supplied argument using argparse?
 
 with open(file, "r") as fh_in:
     # get header row for column names
@@ -31,7 +30,7 @@ with open(file, "r") as fh_in:
         rec = dict(zip(columns, line.split(seperator)))
 
         # check product ID exists
-        product_id = rec.get("Product_ID")
+        product_id = rec.get("Product_ID")  #TODO make a supplied argument using argparse (so any key could be used)
         if product_id:
             # add sale to the list for the product
             products[product_id].append(rec)
